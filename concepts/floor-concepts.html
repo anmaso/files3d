@@ -1,0 +1,831 @@
+<title>files3d Floor Concepts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: a drafting sheet. One wide hero viewer with a building-section rail, two study viewers side by side, then a legend and open questions. */
+:root {
+  --bg: #E6EAEE;
+  --sheet: #F3F5F7;
+  --ink: #16202B;
+  --muted: #5A6774;
+  --rule: #C6CFD8;
+  --edge: #8D9AA7;
+  --grid: rgba(40, 70, 100, 0.07);
+  --slab-top: #FBFCFD;
+  --slab-x: #CDD5DD;
+  --slab-y: #B5C0CA;
+  --room: #FFFFFF;
+  --lobby: #EEF2F5;
+  --wall: #DCE2E8;
+  --wall-x: #C3CCD5;
+  --wall-y: #AFBAC5;
+  --accent: #C98A12;
+  --accent-soft: rgba(214, 150, 30, 0.22);
+  --accent-ink: #855600;
+  --k-code: #4F7DB3;
+  --k-docs: #5E9474;
+  --k-media: #B8697A;
+  --k-style: #7F6CC0;
+  --k-config: #7E8996;
+  --k-data: #3E9893;
+  --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E141A; --sheet: #141C24; --ink: #E2E8EE; --muted: #93A1AF; --rule: #283340; --edge: #4A596B;
+    --grid: rgba(160, 190, 220, 0.06); --slab-top: #1D2731; --slab-x: #141B23; --slab-y: #0F151B;
+    --room: #24303D; --lobby: #1A232D; --wall: #34424F; --wall-x: #2A3643; --wall-y: #212C37;
+    --accent: #F0B43C; --accent-soft: rgba(240, 180, 60, 0.2); --accent-ink: #F5CB72;
+    --k-code: #6C98CF; --k-docs: #74AE8A; --k-media: #D08494; --k-style: #9A88DA; --k-config: #95A0AD; --k-data: #55B3AE;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E141A; --sheet: #141C24; --ink: #E2E8EE; --muted: #93A1AF; --rule: #283340; --edge: #4A596B;
+  --grid: rgba(160, 190, 220, 0.06); --slab-top: #1D2731; --slab-x: #141B23; --slab-y: #0F151B;
+  --room: #24303D; --lobby: #1A232D; --wall: #34424F; --wall-x: #2A3643; --wall-y: #212C37;
+  --accent: #F0B43C; --accent-soft: rgba(240, 180, 60, 0.2); --accent-ink: #F5CB72;
+  --k-code: #6C98CF; --k-docs: #74AE8A; --k-media: #D08494; --k-style: #9A88DA; --k-config: #95A0AD; --k-data: #55B3AE;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.55; }
+.page { max-width: 1180px; margin: 0 auto; padding-inline: 20px; padding-block: 40px 72px; display: flex; flex-direction: column; gap: 40px; }
+
+header { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px 40px; align-items: end; border-bottom: 1px solid var(--rule); padding-bottom: 24px; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--f-display); font-stretch: 72%; font-weight: 750; font-size: clamp(40px, 7vw, 76px); line-height: 0.95; letter-spacing: -0.01em; margin: 8px 0 14px; text-wrap: balance; }
+.lede { max-width: 62ch; margin: 0; color: var(--ink); }
+.titleblock { font-family: var(--f-mono); font-size: 12px; color: var(--muted); border: 1px solid var(--rule); display: grid; grid-template-columns: auto auto; min-width: 0; }
+.titleblock span { padding: 6px 10px; border-bottom: 1px solid var(--rule); }
+.titleblock span:nth-child(odd) { border-right: 1px solid var(--rule); text-transform: uppercase; letter-spacing: 0.06em; }
+.titleblock span:nth-last-child(-n+2) { border-bottom: 0; }
+.titleblock b { color: var(--ink); font-weight: 500; }
+
+h2 { font-family: var(--f-display); font-stretch: 80%; font-weight: 700; font-size: 28px; line-height: 1.1; margin: 0; text-wrap: balance; }
+h3 { font-family: var(--f-display); font-stretch: 85%; font-weight: 650; font-size: 18px; margin: 0; }
+.tag { font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-ink); }
+p { margin: 0; }
+.muted { color: var(--muted); }
+
+.concept { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.concept-head { display: flex; flex-direction: column; gap: 6px; max-width: 70ch; }
+
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 0; background: var(--sheet); border: 1px solid var(--rule); }
+.studies { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+.frame { background: var(--sheet); border: 1px solid var(--rule); display: flex; flex-direction: column; min-width: 0; }
+
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 12px; border-bottom: 1px solid var(--rule); font-family: var(--f-mono); font-size: 12px; min-width: 0; }
+.crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; min-width: 0; flex: 1 1 auto; }
+.crumbs button { font: inherit; color: var(--muted); background: none; border: 0; padding: 3px 5px; cursor: pointer; border-radius: 3px; }
+.crumbs button:hover { color: var(--ink); background: var(--accent-soft); }
+.crumbs button[aria-current="true"] { color: var(--ink); font-weight: 600; cursor: default; background: none; }
+.crumbs .sep { color: var(--edge); }
+.btn { font: inherit; font-size: 12px; color: var(--ink); background: var(--room); border: 1px solid var(--rule); padding: 4px 10px; border-radius: 3px; cursor: pointer; white-space: nowrap; }
+.btn:hover:not(:disabled) { border-color: var(--accent); }
+.btn:disabled { color: var(--muted); opacity: 0.6; cursor: default; }
+.toggle { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); cursor: pointer; white-space: nowrap; }
+.toggle input { accent-color: var(--accent); margin: 0; }
+button:focus-visible, canvas:focus-visible, .toggle input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.stage { position: relative; width: 100%; aspect-ratio: 4 / 3; max-width: 100%; }
+.hero .stage { aspect-ratio: 16 / 10; min-height: 360px; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: manipulation; }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--sheet); font-family: var(--f-mono); font-size: 12px; line-height: 1.4; padding: 6px 9px; border-radius: 3px; max-width: 240px; transform: translate(12px, 12px); white-space: normal; }
+.tip b { font-weight: 600; }
+.tip .hint { opacity: 0.7; display: block; }
+
+.rail { border-left: 1px solid var(--rule); display: flex; flex-direction: column; min-width: 0; }
+.rail-head { padding: 10px 14px; border-bottom: 1px solid var(--rule); font-family: var(--f-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.section { list-style: none; margin: 0; padding: 14px; display: flex; flex-direction: column; gap: 0; flex: 1; justify-content: flex-end; }
+.section li button { width: 100%; text-align: left; font: inherit; background: none; border: 0; border-bottom: 3px solid var(--edge); padding: 10px 4px 6px; cursor: pointer; display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 2px 8px; color: var(--ink); }
+.section li button:hover { background: var(--accent-soft); }
+.section li .lv { font-family: var(--f-mono); font-size: 12px; color: var(--muted); grid-row: span 2; }
+.section li .nm { font-family: var(--f-mono); font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.section li .mt { font-size: 12px; color: var(--muted); }
+.section li.top button { border-bottom-color: var(--accent); cursor: default; }
+.section li.top .lv { color: var(--accent-ink); font-weight: 600; }
+.section li.ghost button { opacity: 0.55; }
+.ground { margin: 0 14px 14px; height: 8px; background: repeating-linear-gradient(135deg, var(--edge) 0 1px, transparent 1px 6px); }
+
+.caption { padding: 10px 12px; border-top: 1px solid var(--rule); font-size: 13px; color: var(--muted); }
+
+.legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0; border-top: 1px solid var(--rule); border-left: 1px solid var(--rule); }
+.legend > div { padding: 14px 16px; border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.legend .k { font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+.legend .v { font-weight: 500; }
+.legend .d { font-size: 13px; color: var(--muted); }
+.swatches { display: flex; flex-wrap: wrap; gap: 6px 12px; margin-top: 4px; font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+.swatches i { display: inline-block; width: 10px; height: 10px; margin-right: 5px; vertical-align: -1px; }
+
+.questions { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px 32px; margin: 0; padding: 0; list-style: none; }
+.questions li { border-top: 1px solid var(--rule); padding-top: 10px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.questions p { font-size: 14px; color: var(--muted); max-width: 60ch; }
+
+@media (max-width: 860px) {
+  header { grid-template-columns: minmax(0, 1fr); }
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .rail { border-left: 0; border-top: 1px solid var(--rule); }
+  .section { flex-direction: row; flex-wrap: wrap; justify-content: flex-start; }
+  .section li { flex: 1 1 140px; }
+  .ground { display: none; }
+  .studies { grid-template-columns: minmax(0, 1fr); }
+  .hero .stage { min-height: 300px; aspect-ratio: 1 / 1; }
+}
+</style>
+
+<div class="page">
+  <header>
+    <div>
+      <div class="eyebrow">files3d · concept sheet 01</div>
+      <h1>Folders as floors</h1>
+      <p class="lede">Each folder is a floor plate. Its subfolders are rooms and its files are blocks standing in those rooms. Opening a room builds the next floor on top, and the floors you came from stay underneath, partly hidden by the one you are on. Three ways to stack them, all in a fixed isometric view, all clickable with a sample project.</p>
+    </div>
+    <div class="titleblock" aria-label="Sheet details">
+      <span>Projection</span><span><b>Isometric 30°</b></span>
+      <span>Sample</span><span><b>atlas/</b> · 58 items</span>
+      <span>Navigate</span><span><b>click room ↑ · Esc ↓</b></span>
+    </div>
+  </header>
+
+  <section class="concept" aria-labelledby="a-title">
+    <div class="concept-head">
+      <span class="tag">Concept A</span>
+      <h2 id="a-title">Stacked plates</h2>
+      <p class="muted">Every floor has the same footprint and sits directly over its parent. Parent floors fade with depth, so you always see two or three levels of where you came from. The room you climbed out of is lit from inside. The rail on the right is a building section of the current path.</p>
+    </div>
+    <div class="hero">
+      <div class="frame" style="border:0">
+        <div class="toolbar">
+          <nav class="crumbs" id="a-crumbs" aria-label="Path"></nav>
+          <label class="toggle"><input type="checkbox" id="a-ghost" checked> Fade lower floors</label>
+          <button class="btn" id="a-back">↓ Parent floor</button>
+        </div>
+        <div class="stage" id="a-stage"><canvas id="a-canvas" tabindex="0" aria-label="Isometric stacked floor view of the sample project. Click a room to go up into it."></canvas><div class="tip" id="a-tip" hidden></div></div>
+      </div>
+      <aside class="rail" aria-label="Building section">
+        <div class="rail-head">Section · current path</div>
+        <ol class="section" id="a-section"></ol>
+        <div class="ground" aria-hidden="true"></div>
+      </aside>
+    </div>
+  </section>
+
+  <div class="studies">
+    <section class="concept" aria-labelledby="b-title">
+      <div class="concept-head">
+        <span class="tag">Concept B</span>
+        <h2 id="b-title">Light well</h2>
+        <p class="muted">The new floor rises centred over the room you entered, joined to it by a lit shaft. Going deeper grows the tower sideways, so the path reads as a staircase of floors and the parent is less hidden.</p>
+      </div>
+      <div class="frame">
+        <div class="toolbar">
+          <nav class="crumbs" id="b-crumbs" aria-label="Path"></nav>
+          <button class="btn" id="b-back">↓ Parent</button>
+        </div>
+        <div class="stage" id="b-stage"><canvas id="b-canvas" tabindex="0" aria-label="Light well view. Click a room to go up into it."></canvas><div class="tip" id="b-tip" hidden></div></div>
+      </div>
+    </section>
+
+    <section class="concept" aria-labelledby="c-title">
+      <div class="concept-head">
+        <span class="tag">Concept C</span>
+        <h2 id="c-title">Exploded section</h2>
+        <p class="muted">Floors pull far apart and the ones below collapse to plan outlines joined by corner leaders. Only the top floor has walls and contents. Good as an overview mode that you toggle into to see the whole path at once.</p>
+      </div>
+      <div class="frame">
+        <div class="toolbar">
+          <nav class="crumbs" id="c-crumbs" aria-label="Path"></nav>
+          <button class="btn" id="c-back">↓ Parent</button>
+        </div>
+        <div class="stage" id="c-stage"><canvas id="c-canvas" tabindex="0" aria-label="Exploded view. Click a room to go up into it."></canvas><div class="tip" id="c-tip" hidden></div></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="concept" aria-labelledby="v-title">
+    <div class="concept-head">
+      <span class="tag">Vocabulary</span>
+      <h2 id="v-title">What maps to what</h2>
+    </div>
+    <div class="legend">
+      <div><span class="k">folder you are in</span><span class="v">Floor plate</span><span class="d">A 12 × 12 slab. Subfolders fill it as a squarified treemap; room area follows the square root of bytes.</span></div>
+      <div><span class="k">subfolder</span><span class="v">Room with a door</span><span class="d">Click it to build its floor on top. A stair in the back corner means it has subfolders of its own.</span></div>
+      <div><span class="k">file</span><span class="v">Block</span><span class="d">Height grows with the log of size. Loose files sit in a lobby strip along the front edge.</span>
+        <div class="swatches"><span><i style="background:var(--k-code)"></i>code</span><span><i style="background:var(--k-docs)"></i>docs</span><span><i style="background:var(--k-media)"></i>media</span><span><i style="background:var(--k-style)"></i>style</span><span><i style="background:var(--k-data)"></i>data</span><span><i style="background:var(--k-config)"></i>config</span></div>
+      </div>
+      <div><span class="k">path you climbed</span><span class="v">Lit room and shaft</span><span class="d">The room you left glows amber and a light shaft runs from it to the floor above.</span></div>
+      <div><span class="k">parent folders</span><span class="v">Floors below</span><span class="d">Still drawn, faded by depth, and clickable to drop back down to that level.</span></div>
+    </div>
+  </section>
+
+  <section class="concept" aria-labelledby="q-title">
+    <div class="concept-head">
+      <span class="tag">Next decisions</span>
+      <h2 id="q-title">Open questions</h2>
+    </div>
+    <ul class="questions">
+      <li><h3>Huge folders</h3><p>A node_modules with 1,000+ entries cannot be 1,000 rooms. Options: one storage room with a count, a paginated wing, or rooms only for the largest N and a "more" room.</p></li>
+      <li><h3>Layout stability</h3><p>A squarified treemap reshuffles rooms when sizes change. An ordered or strip treemap keeps rooms in place so people build spatial memory.</p></li>
+      <li><h3>What sets room size</h3><p>Bytes, item count, or equal rooms. Bytes make media folders huge; counts favour source trees. Could be a toggle.</p></li>
+      <li><h3>Symlinks and search</h3><p>Symlinks as bridges to another floor of the tower. Search results light up matching rooms on every visible floor at once.</p></li>
+      <li><h3>Camera</h3><p>Fixed isometric keeps reading easy. Allow 90° rotation steps so tall blocks never hide a room, but no free orbit.</p></li>
+      <li><h3>Renderer</h3><p>These sketches use 2D canvas with painter's ordering. The real build would use Three.js with an orthographic camera at isometric angles, for proper depth, picking and smooth transitions.</p></li>
+    </ul>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  const P = 12, T = 0.35, WH = 0.6, WT = 0.07;
+  const C30 = Math.cos(Math.PI / 6), S30 = 0.5;
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- sample tree ---------- */
+  const d = (name, ...children) => ({ name, type: "dir", children });
+  const f = (name, size) => ({ name, type: "file", size });
+  const ROOT = d("atlas",
+    d("src",
+      d("components", f("Button.tsx", 4200), f("Modal.tsx", 9100), f("Table.tsx", 14300), f("Chart.tsx", 22800), f("Sidebar.tsx", 7600), f("index.ts", 900)),
+      d("lib", f("api.ts", 12100), f("auth.ts", 8300), f("format.ts", 3100), f("cache.ts", 6400)),
+      d("pages", f("home.tsx", 6900), f("settings.tsx", 11200), f("billing.tsx", 9800),
+        d("reports", f("q1.tsx", 5200), f("q2.tsx", 5600), f("export.ts", 7400), f("charts.ts", 10300),
+          d("archive", f("2024.csv", 184000), f("2025.csv", 212000), f("notes.md", 2400))),
+        d("admin", f("users.tsx", 8800), f("audit.tsx", 6100))),
+      d("styles", f("base.css", 5400), f("theme.css", 3900), f("print.css", 1200)),
+      f("main.tsx", 1400), f("App.tsx", 3800), f("router.ts", 2900)),
+    d("docs", f("architecture.md", 18400), f("api.md", 26100), f("onboarding.md", 9200),
+      d("diagrams", f("flow.svg", 34000), f("schema.png", 148000))),
+    d("assets",
+      d("images", f("hero.jpg", 820000), f("logo.svg", 6200), f("team.png", 410000), f("empty-state.svg", 11800)),
+      d("fonts", f("plex-sans.woff2", 96000), f("plex-mono.woff2", 88000))),
+    d("tests",
+      d("unit", f("api.test.ts", 9400), f("format.test.ts", 4100), f("auth.test.ts", 7700)),
+      d("e2e", f("login.spec.ts", 6200), f("reports.spec.ts", 8900))),
+    d("scripts", f("build.sh", 2100), f("release.sh", 3400), f("seed.sql", 15800)),
+    f("package.json", 2300), f("README.md", 6800), f("tsconfig.json", 900), f(".gitignore", 300), f("LICENSE", 1100), f("vite.config.ts", 1300)
+  );
+
+  const KIND = { ts: "code", tsx: "code", js: "code", sh: "code", md: "docs", txt: "docs", png: "media", jpg: "media", svg: "media", woff2: "media", css: "style", json: "config", csv: "data", sql: "data" };
+  function kindOf(name) {
+    if (name === "LICENSE") return "docs";
+    if (name.startsWith(".")) return "config";
+    if (/\.config\./.test(name)) return "config";
+    const ext = name.split(".").pop();
+    return KIND[ext] || "config";
+  }
+  function prep(n, parent) {
+    n.parent = parent;
+    if (n.type === "file") { n.kind = kindOf(n.name); n.files = 1; return n.size; }
+    n.size = 0; n.files = 0;
+    for (const c of n.children) { n.size += prep(c, n); n.files += c.type === "file" ? 1 : c.files; }
+    n.subdirs = n.children.filter(c => c.type === "dir").length;
+    return n.size;
+  }
+  prep(ROOT, null);
+  const find = (n, name) => n.children.find(c => c.name === name);
+  function fmtSize(b) {
+    if (b < 1000) return b + " B";
+    if (b < 1e6) return (b / 1000).toFixed(b < 1e4 ? 1 : 0) + " KB";
+    return (b / 1e6).toFixed(1) + " MB";
+  }
+  const directFiles = n => n.children.filter(c => c.type === "file").length;
+
+  /* ---------- floor layout ---------- */
+  function squarify(items, x, y, w, h) {
+    const total = items.reduce((s, it) => s + it.w, 0);
+    const scale = (w * h) / total;
+    let rest = items.map(it => ({ ...it, area: it.w * scale }));
+    const out = [];
+    const worst = (row, side) => {
+      const s = row.reduce((a, r) => a + r.area, 0);
+      const mx = Math.max(...row.map(r => r.area)), mn = Math.min(...row.map(r => r.area));
+      return Math.max((side * side * mx) / (s * s), (s * s) / (side * side * mn));
+    };
+    while (rest.length) {
+      const side = Math.min(w, h);
+      let row = [], best = Infinity;
+      while (rest.length) {
+        const cand = row.concat(rest[0]);
+        const r = worst(cand, side);
+        if (row.length && r > best) break;
+        row = cand; best = r; rest.shift();
+      }
+      const ra = row.reduce((a, r) => a + r.area, 0);
+      if (w >= h) {
+        const cw = ra / h; let cy = y;
+        for (const it of row) { const hh = it.area / cw; out.push({ it, x, y: cy, w: cw, h: hh }); cy += hh; }
+        x += cw; w -= cw;
+      } else {
+        const rh = ra / w; let cx = x;
+        for (const it of row) { const ww = it.area / rh; out.push({ it, x: cx, y, w: ww, h: rh }); cx += ww; }
+        y += rh; h -= rh;
+      }
+    }
+    return out;
+  }
+
+  function gridBlocks(items, x0, y0, x1, y1, cellMax) {
+    const w = x1 - x0, h = y1 - y0, n = items.length;
+    if (!n || w < 0.3 || h < 0.3) return [];
+    let cell = cellMax, cols, rows;
+    for (;;) {
+      cols = Math.max(1, Math.floor(w / cell)); rows = Math.max(1, Math.floor(h / cell));
+      if (cols * rows >= n || cell < 0.35) break;
+      cell *= 0.9;
+    }
+    const cap = Math.min(n, cols * rows), out = [];
+    const cw = w / cols, ch = h / rows, half = Math.min(cw, ch) * 0.34;
+    for (let i = 0; i < cap; i++) {
+      const c = i % cols, r = Math.floor(i / cols), node = items[i];
+      const cx = x0 + (c + 0.5) * cw, cy = y0 + (r + 0.5) * ch;
+      const hh = (0.16 + Math.max(0, Math.log10(node.size) - 2.3) * 0.3) * Math.min(1, (half * 2) / 0.85);
+      out.push({ node, cx, cy, x0: cx - half, y0: cy - half, x1: cx + half, y1: cy + half, h: hh, cell: Math.min(cw, ch) });
+    }
+    return out.sort((a, b) => (a.cx + a.cy) - (b.cx + b.cy));
+  }
+
+  function orderRooms(rooms) {
+    const eps = 1e-6;
+    const behind = (a, b) => a.x1 <= b.x0 + eps || a.y1 <= b.y0 + eps;
+    const n = rooms.length, indeg = new Array(n).fill(0), adj = rooms.map(() => []);
+    for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+      if (i !== j && behind(rooms[i], rooms[j]) && !behind(rooms[j], rooms[i])) { adj[i].push(j); indeg[j]++; }
+    }
+    const q = [], out = [];
+    for (let i = 0; i < n; i++) if (!indeg[i]) q.push(i);
+    while (q.length) { const i = q.shift(); out.push(rooms[i]); for (const j of adj[i]) if (!--indeg[j]) q.push(j); }
+    if (out.length < n) return rooms.slice().sort((a, b) => (a.x0 + a.y0) - (b.x0 + b.y0));
+    return out;
+  }
+
+  function layout(n) {
+    if (n._L) return n._L;
+    const dirs = n.children.filter(c => c.type === "dir"), files = n.children.filter(c => c.type === "file");
+    const M = 0.45, L = { rooms: [], files: [], lobby: null };
+    let ry1 = P - M;
+    if (files.length) {
+      const depth = dirs.length ? Math.min(3.2, 1.6 + Math.ceil(files.length / 7) * 0.8) : P - 2 * M;
+      L.lobby = { x0: M, y0: P - M - depth, x1: P - M, y1: P - M };
+      ry1 = L.lobby.y0 - 0.35;
+      const lb = L.lobby;
+      L.files = gridBlocks(files, lb.x0 + 0.25, lb.y0 + 0.25, lb.x1 - 0.25, lb.y1 - 0.55, dirs.length ? 1.25 : 1.9);
+    }
+    if (dirs.length) {
+      const items = dirs.map(c => ({ node: c, w: Math.sqrt(c.size) })).sort((a, b) => b.w - a.w);
+      const g = 0.14;
+      const rects = squarify(items, M, M, P - 2 * M, ry1 - M);
+      L.rooms = orderRooms(rects.map(r => {
+        const room = { node: r.it.node, x0: r.x + g, y0: r.y + g, x1: r.x + r.w - g, y1: r.y + r.h - g };
+        room.hasSub = room.node.subdirs > 0;
+        const labelStrip = (room.y1 - room.y0) > 1.6 ? 0.7 : 0.45;
+        const ix1 = room.x1 - 0.22 - (room.hasSub ? 0.6 : 0);
+        room.blocks = gridBlocks(room.node.children.filter(c => c.type === "file"), room.x0 + 0.22, room.y0 + 0.22, ix1, room.y1 - labelStrip, 0.9);
+        return room;
+      }));
+    }
+    n._L = L;
+    return L;
+  }
+
+  /* ---------- theme tokens ---------- */
+  let TOK = {};
+  function readTokens() {
+    const cs = getComputedStyle(document.documentElement);
+    const g = k => cs.getPropertyValue("--" + k).trim();
+    TOK = {
+      ink: g("ink"), muted: g("muted"), edge: g("edge"), grid: g("grid"), sheet: g("sheet"),
+      slabTop: g("slab-top"), slabX: g("slab-x"), slabY: g("slab-y"), room: g("room"), lobby: g("lobby"),
+      wall: g("wall"), wallX: g("wall-x"), wallY: g("wall-y"), accent: g("accent"), accentSoft: g("accent-soft"), accentInk: g("accent-ink"),
+      kind: { code: g("k-code"), docs: g("k-docs"), media: g("k-media"), style: g("k-style"), config: g("k-config"), data: g("k-data") },
+      mono: g("f-mono")
+    };
+  }
+  function rgb(h) {
+    h = h.replace("#", "");
+    if (h.length === 3) h = h.split("").map(c => c + c).join("");
+    const n = parseInt(h, 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+  function shade(h, k) { const [r, g, b] = rgb(h); return `rgb(${(r * k) | 0},${(g * k) | 0},${(b * k) | 0})`; }
+
+  /* ---------- viewer ---------- */
+  const MODES = {
+    stack:    { gap: 3.4, levelsAbove: 0.78, heightLevels: 1.6, widthFrac: 0.88 },
+    well:     { gap: 3.6, levelsAbove: 0.8,  heightLevels: 1.7, widthFrac: 0.66 },
+    exploded: { gap: 5.6, levelsAbove: 1.35, heightLevels: 2.75, widthFrac: 0.84 }
+  };
+
+  class Viewer {
+    constructor(prefix, mode, startPath) {
+      this.mode = mode; this.cfg = MODES[mode]; this.gap = this.cfg.gap;
+      this.canvas = document.getElementById(prefix + "-canvas");
+      this.stage = document.getElementById(prefix + "-stage");
+      this.tip = document.getElementById(prefix + "-tip");
+      this.crumbs = document.getElementById(prefix + "-crumbs");
+      this.back = document.getElementById(prefix + "-back");
+      this.section = document.getElementById(prefix + "-section");
+      this.ctx = this.canvas.getContext("2d");
+      this.off = document.createElement("canvas");
+      this.octx = this.off.getContext("2d");
+      this.ghost = true; this.stack = []; this.leaving = []; this.hover = null; this.dirty = true;
+      this.cam = { x: P / 2, y: P / 2, z: 0, tx: P / 2, ty: P / 2, tz: 0 };
+      this.W = 300; this.H = 200; this.s = 10; this.dpr = 1;
+
+      this.stack.push(this.entry(ROOT, 0, 0, 0));
+      let node = ROOT;
+      for (const name of startPath) {
+        const room = layout(node).rooms.find(r => r.node.name === name);
+        this.push(room, true);
+        node = room.node;
+      }
+      this.snap();
+
+      new ResizeObserver(() => this.resize()).observe(this.stage);
+      this.resize();
+      this.canvas.addEventListener("pointermove", e => this.onMove(e));
+      this.canvas.addEventListener("pointerleave", () => { this.hover = null; this.tip.hidden = true; this.canvas.style.cursor = ""; this.dirty = true; });
+      this.canvas.addEventListener("click", e => this.onClick(e));
+      this.canvas.addEventListener("keydown", e => {
+        if (e.key === "Escape" || e.key === "Backspace") { e.preventDefault(); this.up(); }
+      });
+      this.back.addEventListener("click", () => this.up());
+      this.renderUI();
+    }
+    entry(node, z, ox, oy) { return { node, via: null, z, tz: z, a: 1, ta: 1, ox, oy, tox: ox, toy: oy }; }
+    top() { return this.stack[this.stack.length - 1]; }
+
+    push(room, instant) {
+      const parent = this.top();
+      parent.via = room;
+      let tox = 0, toy = 0;
+      if (this.mode === "well") {
+        tox = parent.tox + (room.x0 + room.x1) / 2 - P / 2;
+        toy = parent.toy + (room.y0 + room.y1) / 2 - P / 2;
+      }
+      const e = this.entry(room.node, parent.tz + this.gap, tox, toy);
+      if (!instant) { e.z = parent.z + this.gap * 0.5; e.a = 0; }
+      this.stack.push(e);
+      this.retarget();
+    }
+    popTo(i) {
+      if (i >= this.stack.length - 1) return;
+      while (this.stack.length > i + 1) {
+        const e = this.stack.pop();
+        e.ta = 0; e.tz += this.gap * 0.6; e.via = null;
+        this.leaving.push(e);
+      }
+      this.top().via = null;
+      this.retarget();
+    }
+    up() { if (this.stack.length > 1) this.popTo(this.stack.length - 2); }
+    alphaFor(depth) {
+      if (this.mode === "exploded") return depth === 0 ? 1 : Math.max(0.3, 0.9 - depth * 0.18);
+      if (this.mode === "stack" && !this.ghost) return depth < 4 ? 1 : 0;
+      return [1, 0.6, 0.32, 0.15][depth] ?? 0;
+    }
+    retarget() {
+      const n = this.stack.length;
+      this.stack.forEach((e, i) => { e.ta = this.alphaFor(n - 1 - i); });
+      const t = this.top(), p = this.stack[n - 2];
+      let cx = t.tox + P / 2, cy = t.toy + P / 2;
+      if (this.mode === "well" && p) { cx = cx * 0.62 + (p.tox + P / 2) * 0.38; cy = cy * 0.62 + (p.toy + P / 2) * 0.38; }
+      this.cam.tx = cx; this.cam.ty = cy; this.cam.tz = t.tz - this.gap * this.cfg.levelsAbove;
+      this.hover = null; this.tip.hidden = true;
+      this.dirty = true;
+      if (this.crumbs) this.renderUI();
+    }
+    snap() {
+      for (const e of this.stack) { e.z = e.tz; e.a = e.ta; e.ox = e.tox; e.oy = e.toy; }
+      this.cam.x = this.cam.tx; this.cam.y = this.cam.ty; this.cam.z = this.cam.tz;
+    }
+    step(dt) {
+      const k = reduceMotion ? 1 : 1 - Math.pow(0.002, dt);
+      let moving = false;
+      const ease = (o, a, b) => { const d = o[b] - o[a]; if (Math.abs(d) > 1e-3) { o[a] += d * k; moving = true; } else o[a] = o[b]; };
+      for (const e of this.stack.concat(this.leaving)) { ease(e, "z", "tz"); ease(e, "a", "ta"); ease(e, "ox", "tox"); ease(e, "oy", "toy"); }
+      ease(this.cam, "x", "tx"); ease(this.cam, "y", "ty"); ease(this.cam, "z", "tz");
+      this.leaving = this.leaving.filter(e => e.a > 0.01);
+      return moving;
+    }
+
+    resize() {
+      const r = this.stage.getBoundingClientRect();
+      this.dpr = Math.min(window.devicePixelRatio || 1, 2);
+      this.W = Math.max(200, r.width); this.H = Math.max(200, r.height);
+      for (const c of [this.canvas, this.off]) { c.width = Math.round(this.W * this.dpr); c.height = Math.round(this.H * this.dpr); }
+      this.s = Math.min((this.W * this.cfg.widthFrac) / (2 * P * C30), (this.H * 0.94) / (P + this.gap * this.cfg.heightLevels));
+      this.dirty = true;
+    }
+    pr(x, y, z) {
+      const c = this.cam, s = this.s;
+      return [this.W / 2 + (x - y - (c.x - c.y)) * C30 * s, this.H / 2 + ((x + y - (c.x + c.y)) * S30 - (z - c.z)) * s];
+    }
+    unpr(px, py, z) {
+      const c = this.cam, s = this.s;
+      const a = (px - this.W / 2) / (C30 * s) + (c.x - c.y);
+      const b = ((py - this.H / 2) / s + (z - c.z)) / S30 + (c.x + c.y);
+      return [(a + b) / 2, (b - a) / 2];
+    }
+
+    /* drawing helpers */
+    poly(g, pts, fill, stroke, lw) {
+      g.beginPath(); g.moveTo(pts[0][0], pts[0][1]);
+      for (let i = 1; i < pts.length; i++) g.lineTo(pts[i][0], pts[i][1]);
+      g.closePath();
+      if (fill) { g.fillStyle = fill; g.fill(); }
+      if (stroke) { g.strokeStyle = stroke; g.lineWidth = lw || 1; g.stroke(); }
+    }
+    rect(g, x0, y0, x1, y1, z, fill, stroke, lw) {
+      const p = (x, y) => this.pr(x, y, z);
+      this.poly(g, [p(x0, y0), p(x1, y0), p(x1, y1), p(x0, y1)], fill, stroke, lw);
+    }
+    box(g, x0, y0, x1, y1, z0, z1, top, sx, sy, stroke) {
+      const p = (x, y, z) => this.pr(x, y, z);
+      this.poly(g, [p(x1, y0, z0), p(x1, y1, z0), p(x1, y1, z1), p(x1, y0, z1)], sx, stroke, 0.75);
+      this.poly(g, [p(x0, y1, z0), p(x1, y1, z0), p(x1, y1, z1), p(x0, y1, z1)], sy, stroke, 0.75);
+      this.poly(g, [p(x0, y0, z1), p(x1, y0, z1), p(x1, y1, z1), p(x0, y1, z1)], top, stroke, 0.75);
+    }
+    floorText(g, text, x, y, z, size, color, maxW, weight) {
+      const fs = size * this.s;
+      if (fs < 7) return;
+      const [px, py] = this.pr(x, y, z), dpr = this.dpr;
+      g.save();
+      g.setTransform(dpr * C30, dpr * S30, -dpr * C30, dpr * S30, dpr * px, dpr * py);
+      g.font = `${weight || 500} ${fs}px ${TOK.mono}`;
+      g.fillStyle = color; g.textBaseline = "alphabetic";
+      let t = text;
+      if (maxW) {
+        const mw = maxW * this.s;
+        if (g.measureText(t).width > mw) { while (t.length > 1 && g.measureText(t + "…").width > mw) t = t.slice(0, -1); t += "…"; }
+      }
+      g.fillText(t, 0, 0);
+      g.restore();
+    }
+
+    drawBlock(g, b, ox, oy, z, hovered) {
+      const col = TOK.kind[b.node.kind] || TOK.kind.config;
+      this.box(g, ox + b.x0, oy + b.y0, ox + b.x1, oy + b.y1, z, z + b.h, col, shade(col, 0.78), shade(col, 0.62), hovered ? TOK.accent : null);
+      if (hovered) this.rect(g, ox + b.x0, oy + b.y0, ox + b.x1, oy + b.y1, z + b.h, null, TOK.accent, 2);
+    }
+    drawStair(g, room, ox, oy, z) {
+      const x1 = ox + room.x1 - 0.15, x0 = x1 - 0.42, ys = oy + room.y0 + 0.15, step = 0.24;
+      for (let i = 2; i >= 0; i--) {
+        const y0 = ys + (2 - i) * step;
+        this.box(g, x0, y0, x1, y0 + step, z, z + 0.1 + i * 0.12, TOK.wall, TOK.wallX, TOK.wallY, TOK.edge);
+      }
+    }
+
+    drawFloor(g, e, depth) {
+      const L = layout(e.node), ox = e.ox, oy = e.oy, z = e.z;
+      const plan = this.mode === "exploded" && depth > 0;
+      const isTop = depth === 0;
+      const hov = isTop && this.hover ? this.hover : null;
+
+      // slab
+      if (plan) {
+        this.rect(g, ox, oy, ox + P, oy + P, z, TOK.slabTop, TOK.edge, 1);
+      } else {
+        this.box(g, ox, oy, ox + P, oy + P, z - T, z, TOK.slabTop, TOK.slabX, TOK.slabY, TOK.edge);
+      }
+      g.lineWidth = 1; g.strokeStyle = TOK.grid; g.beginPath();
+      for (let i = 1; i < P; i++) {
+        let a = this.pr(ox + i, oy, z), b = this.pr(ox + i, oy + P, z); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]);
+        a = this.pr(ox, oy + i, z); b = this.pr(ox + P, oy + i, z); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]);
+      }
+      g.stroke();
+
+      // lobby
+      if (L.lobby) {
+        const lb = L.lobby;
+        g.setLineDash([4, 3]);
+        this.rect(g, ox + lb.x0, oy + lb.y0, ox + lb.x1, oy + lb.y1, z, TOK.lobby, TOK.edge, 1);
+        g.setLineDash([]);
+        const n = L.files.length, all = directFiles(e.node);
+        this.floorText(g, `${e.node.name}/ · ${all} file${all === 1 ? "" : "s"}`, ox + lb.x0 + 0.25, oy + lb.y1 - 0.18, z, 0.3, TOK.muted, lb.x1 - lb.x0 - 0.5, 500);
+        if (n < all) this.floorText(g, `+${all - n} more`, ox + lb.x1 - 1.6, oy + lb.y1 - 0.18, z, 0.26, TOK.muted, 1.4);
+      }
+
+      // rooms
+      for (const r of L.rooms) {
+        const isVia = e.via === r;
+        const isHov = hov && hov.room === r;
+        this.rect(g, ox + r.x0, oy + r.y0, ox + r.x1, oy + r.y1, z, TOK.room, null);
+        if (isVia || isHov) this.rect(g, ox + r.x0, oy + r.y0, ox + r.x1, oy + r.y1, z, TOK.accentSoft, null);
+        this.rect(g, ox + r.x0, oy + r.y0, ox + r.x1, oy + r.y1, z, null, isVia || isHov ? TOK.accent : TOK.edge, isVia || isHov ? 1.5 : 0.8);
+        const rw = r.x1 - r.x0, rd = r.y1 - r.y0;
+        const ls = Math.max(0.22, Math.min(0.42, Math.min(rw, rd) * 0.13));
+        const labelY = r.y1 - (rd > 1.6 ? 0.28 : 0.14);
+        if (plan) {
+          this.floorText(g, r.node.name + "/", ox + r.x0 + 0.2, oy + labelY, z, ls, isVia ? TOK.accentInk : TOK.muted, rw - 0.35, 500);
+          continue;
+        }
+        // back walls
+        this.box(g, ox + r.x0, oy + r.y0, ox + r.x1, oy + r.y0 + WT, z, z + WH, TOK.wall, TOK.wallX, TOK.wallY, TOK.edge);
+        this.box(g, ox + r.x0, oy + r.y0, ox + r.x0 + WT, oy + r.y1, z, z + WH, TOK.wall, TOK.wallX, TOK.wallY, TOK.edge);
+        // label
+        this.floorText(g, r.node.name + "/", ox + r.x0 + 0.25, oy + labelY, z, ls, isVia ? TOK.accentInk : TOK.ink, rw - 0.45, 600);
+        // contents
+        if (r.hasSub) this.drawStair(g, r, ox, oy, z);
+        for (const b of r.blocks) this.drawBlock(g, b, ox, oy, z, hov && hov.block === b);
+        // front walls, lighter so the room reads as cut away
+        g.save(); g.globalAlpha *= 0.82;
+        this.box(g, ox + r.x1 - WT, oy + r.y0, ox + r.x1, oy + r.y1, z, z + WH, TOK.wall, TOK.wallX, TOK.wallY, TOK.edge);
+        const door = Math.min(0.9, rw * 0.4), dc = r.x0 + rw * 0.72;
+        const d0 = Math.max(r.x0 + 0.1, dc - door / 2), d1 = Math.min(r.x1 - 0.1, dc + door / 2);
+        this.box(g, ox + r.x0, oy + r.y1 - WT, ox + d0, oy + r.y1, z, z + WH, TOK.wall, TOK.wallX, TOK.wallY, TOK.edge);
+        this.box(g, ox + d1, oy + r.y1 - WT, ox + r.x1 - WT, oy + r.y1, z, z + WH, TOK.wall, TOK.wallX, TOK.wallY, TOK.edge);
+        g.restore();
+      }
+
+      // loose files
+      if (!plan) {
+        for (const b of L.files) {
+          this.drawBlock(g, b, ox, oy, z, hov && hov.block === b);
+          if (b.cell >= 0.95) this.floorText(g, b.node.name, ox + b.x0 - 0.05, oy + b.y1 + 0.32, z, 0.19, TOK.muted, b.cell - 0.1, 400);
+        }
+      }
+    }
+
+    drawShaft(g, parent, child, alpha) {
+      const r = parent.via; if (!r) return;
+      const ox = parent.ox, oy = parent.oy, z0 = parent.z + 0.02, z1 = child.z - T;
+      if (z1 <= z0) return;
+      const x0 = ox + r.x0 + 0.1, x1 = ox + r.x1 - 0.1, y0 = oy + r.y0 + 0.1, y1 = oy + r.y1 - 0.1;
+      const p = (x, y, z) => this.pr(x, y, z);
+      g.save(); g.globalAlpha = alpha;
+      // back faces
+      this.poly(g, [p(x0, y0, z0), p(x1, y0, z0), p(x1, y0, z1), p(x0, y0, z1)], TOK.accentSoft, null);
+      this.poly(g, [p(x0, y0, z0), p(x0, y1, z0), p(x0, y1, z1), p(x0, y0, z1)], TOK.accentSoft, null);
+      // front faces
+      this.poly(g, [p(x1, y0, z0), p(x1, y1, z0), p(x1, y1, z1), p(x1, y0, z1)], TOK.accentSoft, null);
+      this.poly(g, [p(x0, y1, z0), p(x1, y1, z0), p(x1, y1, z1), p(x0, y1, z1)], TOK.accentSoft, null);
+      g.strokeStyle = TOK.accent; g.lineWidth = 1; g.beginPath();
+      for (const [x, y] of [[x1, y0], [x1, y1], [x0, y1]]) { const a = p(x, y, z0), b = p(x, y, z1); g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]); }
+      g.stroke();
+      g.restore();
+    }
+    drawLeaders(g, lower, upper, alpha) {
+      g.save(); g.globalAlpha = alpha; g.setLineDash([3, 4]); g.strokeStyle = TOK.edge; g.lineWidth = 1; g.beginPath();
+      for (const [x, y] of [[0, 0], [P, 0], [P, P], [0, P]]) {
+        const a = this.pr(lower.ox + x, lower.oy + y, lower.z), b = this.pr(upper.ox + x, upper.oy + y, upper.z - T);
+        g.moveTo(a[0], a[1]); g.lineTo(b[0], b[1]);
+      }
+      g.stroke(); g.restore();
+    }
+
+    render() {
+      const g = this.ctx, o = this.octx, dpr = this.dpr;
+      g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      g.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const n = this.stack.length;
+      const items = this.stack.map((e, i) => ({ e, depth: n - 1 - i, parent: this.stack[i - 1] }))
+        .concat(this.leaving.map(e => ({ e, depth: 0, parent: null })))
+        .sort((a, b) => a.e.z - b.e.z);
+      for (const it of items) {
+        const e = it.e;
+        if (e.a < 0.01) continue;
+        if (it.parent) {
+          const pa = Math.min(1, it.parent.a + 0.25) * e.a;
+          if (this.mode === "exploded") this.drawLeaders(g, it.parent, e, 0.7 * e.a);
+          this.drawShaft(g, it.parent, e, this.mode === "stack" ? pa * 0.8 : pa);
+        }
+        if (e.a > 0.995) {
+          this.drawFloor(g, e, it.depth);
+        } else {
+          o.setTransform(1, 0, 0, 1, 0, 0); o.clearRect(0, 0, this.off.width, this.off.height);
+          o.setTransform(dpr, 0, 0, dpr, 0, 0);
+          this.drawFloor(o, e, it.depth);
+          g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = e.a; g.drawImage(this.off, 0, 0); g.restore();
+        }
+      }
+      // level tags at the left corner of each floor
+      if (this.W >= 480) {
+        g.save();
+        this.stack.forEach((e, i) => {
+          if (e.a < 0.08) return;
+          const [px, py] = this.pr(e.ox, e.oy + P, e.z - T / 2);
+          const isTop = i === n - 1;
+          if (px < 96) return;
+          g.globalAlpha = Math.max(e.a, 0.45);
+          g.textAlign = "right"; g.textBaseline = "middle";
+          g.font = `600 11px ${TOK.mono}`; g.fillStyle = isTop ? TOK.accentInk : TOK.muted;
+          g.fillText(levelName(i), px - 10, py - 7);
+          g.font = `500 12px ${TOK.mono}`; g.fillStyle = TOK.ink;
+          g.fillText(e.node.name + "/", px - 10, py + 8);
+        });
+        g.restore();
+      }
+    }
+
+    /* picking */
+    pick(mx, my) {
+      for (let i = this.stack.length - 1; i >= 0; i--) {
+        const e = this.stack[i];
+        if (e.a < 0.1) continue;
+        const [wx, wy] = this.unpr(mx, my, e.z);
+        const lx = wx - e.ox, ly = wy - e.oy;
+        if (lx < 0 || ly < 0 || lx > P || ly > P) continue;
+        if (i < this.stack.length - 1) return { kind: "floor", level: i };
+        const L = layout(e.node);
+        const hitBlock = list => list.find(b => lx >= b.x0 - 0.08 && lx <= b.x1 + 0.08 && ly >= b.y0 - 0.08 && ly <= b.y1 + 0.08);
+        for (const r of L.rooms) {
+          if (lx >= r.x0 && lx <= r.x1 && ly >= r.y0 && ly <= r.y1) return { kind: "room", room: r, block: hitBlock(r.blocks) || null };
+        }
+        const b = hitBlock(L.files);
+        if (b) return { kind: "file", block: b };
+        return { kind: "top" };
+      }
+      return null;
+    }
+    localXY(ev) { const r = this.canvas.getBoundingClientRect(); return [ev.clientX - r.left, ev.clientY - r.top]; }
+    onMove(ev) {
+      const [mx, my] = this.localXY(ev);
+      const h = this.pick(mx, my);
+      const key = h ? h.kind + (h.room ? h.room.node.name : "") + (h.block ? h.block.node.name : "") + (h.level ?? "") : "";
+      if (key !== this.hoverKey) { this.hoverKey = key; this.hover = h; this.dirty = true; }
+      let html = "";
+      if (h && h.block) html = `<b>${h.block.node.name}</b> · ${fmtSize(h.block.node.size)} · ${h.block.node.kind}`;
+      if (h && h.kind === "room") {
+        const nd = h.room.node, ups = nd.subdirs;
+        html = (html ? html + "<br>in " : "") + `<b>${nd.name}/</b> · ${directFiles(nd)} files${ups ? ` · ${ups} room${ups > 1 ? "s" : ""} above` : ""} · ${fmtSize(nd.size)}<span class="hint">Click to go up into this room</span>`;
+      }
+      if (h && h.kind === "floor") html = `<b>${this.stack[h.level].node.name}/</b> · ${levelName(h.level)}<span class="hint">Click to go back down to this floor</span>`;
+      this.canvas.style.cursor = h && (h.kind === "room" || h.kind === "floor") ? "pointer" : "";
+      if (html) {
+        this.tip.innerHTML = html; this.tip.hidden = false;
+        const tw = this.tip.offsetWidth;
+        this.tip.style.left = Math.min(mx, this.W - tw - 16) + "px";
+        this.tip.style.top = Math.min(my, this.H - 70) + "px";
+      } else this.tip.hidden = true;
+    }
+    onClick(ev) {
+      const [mx, my] = this.localXY(ev);
+      const h = this.pick(mx, my);
+      if (!h) return;
+      if (h.kind === "room") this.push(h.room);
+      else if (h.kind === "floor") this.popTo(h.level);
+    }
+
+    renderUI() {
+      const n = this.stack.length;
+      this.crumbs.innerHTML = "";
+      this.stack.forEach((e, i) => {
+        if (i) { const s = document.createElement("span"); s.className = "sep"; s.textContent = "/"; s.setAttribute("aria-hidden", "true"); this.crumbs.append(s); }
+        const b = document.createElement("button");
+        b.textContent = e.node.name;
+        if (i === n - 1) b.setAttribute("aria-current", "true");
+        else b.addEventListener("click", () => this.popTo(i));
+        this.crumbs.append(b);
+      });
+      this.back.disabled = n < 2;
+      if (this.section) {
+        this.section.innerHTML = "";
+        for (let i = n - 1; i >= 0; i--) {
+          const e = this.stack[i], li = document.createElement("li");
+          const depth = n - 1 - i;
+          if (depth === 0) li.className = "top"; else if (depth >= 3) li.className = "ghost";
+          const nd = e.node;
+          li.innerHTML = `<button type="button"><span class="lv">${levelName(i)}</span><span class="nm">${nd.name}/</span><span class="mt">${nd.subdirs} rooms · ${directFiles(nd)} files · ${fmtSize(nd.size)}</span></button>`;
+          const btn = li.querySelector("button");
+          if (depth === 0) btn.setAttribute("aria-current", "true");
+          else btn.addEventListener("click", () => this.popTo(i));
+          this.section.append(li);
+        }
+      }
+    }
+  }
+  const levelName = i => (i === 0 ? "G" : "L" + i);
+
+  /* ---------- boot ---------- */
+  readTokens();
+  const viewers = [
+    new Viewer("a", "stack", ["src", "pages"]),
+    new Viewer("b", "well", ["src", "pages"]),
+    new Viewer("c", "exploded", ["src", "pages", "reports"])
+  ];
+  const ghost = document.getElementById("a-ghost");
+  ghost.addEventListener("change", () => { viewers[0].ghost = ghost.checked; viewers[0].retarget(); });
+
+  const markAll = () => { readTokens(); viewers.forEach(v => (v.dirty = true)); };
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", markAll);
+  new MutationObserver(markAll).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "class", "style"] });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(markAll);
+
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000); last = now;
+    for (const v of viewers) {
+      const moving = v.step(dt);
+      if (moving || v.dirty) { v.render(); v.dirty = false; }
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
